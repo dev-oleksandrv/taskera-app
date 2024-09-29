@@ -16,7 +16,7 @@ type User struct {
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
 
-func (user *User) BeforeCreate(db *gorm.DB) error {
+func (user *User) BeforeCreate(_ *gorm.DB) error {
 	if hashedPassword, err := utils.HashPassword(user.Password); err != nil {
 		return err
 	} else {

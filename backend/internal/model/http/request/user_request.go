@@ -8,5 +8,5 @@ type UserRegisterRequest struct {
 
 type UserLoginRequest struct {
 	Email    string `binding:"required,email" json:"email"`
-	Password string `binding:"required,password" json:"password"`
+	Password string `binding:"required" json:"password"`
 }
