@@ -34,3 +34,11 @@ func (r *UserRepositoryImpl) Login(user *domain.User) error {
 
 	return nil
 }
+
+func (r *UserRepositoryImpl) GetUserByEmail(email string) (*domain.User, error) {
+	var user domain.User
+	if err := database.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, errors.New("invalid user email")
+	}
+	return &user, nil
+}

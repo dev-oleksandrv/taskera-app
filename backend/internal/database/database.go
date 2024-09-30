@@ -23,6 +23,7 @@ func Init() {
 		dbCfg.Port,
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db.Debug()
 	if err != nil {
 		log.Fatalf("Error connecting to database: %s", err)
 	}

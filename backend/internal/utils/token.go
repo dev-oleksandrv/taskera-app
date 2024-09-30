@@ -3,9 +3,9 @@ package utils
 import (
 	"dev-oleksandrv/taskera-app/internal/config"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -34,7 +34,7 @@ func GenerateJWTToken(id uuid.UUID, email string) string {
 
 func ParseJWTToken(jwtToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(jwtToken, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return config.GetConfig().JWTSecret, nil
+		return []byte(config.GetConfig().JWTSecret), nil
 	})
 	if err != nil {
 		return nil, err
@@ -49,8 +49,8 @@ func ParseJWTToken(jwtToken string) (*UserClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-func ExtractBearerToken(r *http.Request) (string, error) {
-	header := r.Header.Get("Authorization")
+func ExtractBearerToken(ctx *gin.Context) (string, error) {
+	header := ctx.Request.Header.Get("Authorization")
 	if header == "" {
 		return "", errors.New("no authorization header")
 	}

@@ -15,8 +15,9 @@ func main() {
 	r := gin.Default()
 	g := r.Group("/api")
 	router.UserRouter(g)
+	router.SpaceRouter(g)
 
-	if err := r.Run("localhost:8080"); err != nil {
+	if err := r.Run("localhost:8081"); err != nil {
 		panic(err)
 	}
 }

@@ -28,3 +28,11 @@ func (s *UserServiceImpl) Login(user *domain.User) error {
 
 	return nil
 }
+
+func (s *UserServiceImpl) GetUserByEmail(email string) (*domain.User, error) {
+	user, err := s.userRepository.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

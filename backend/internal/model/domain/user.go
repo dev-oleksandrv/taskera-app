@@ -14,6 +14,7 @@ type User struct {
 	Password  string    `gorm:"size:255;not null"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	Spaces    []Space   `gorm:"many2many:space_users"`
 }
 
 func (user *User) BeforeCreate(_ *gorm.DB) error {
