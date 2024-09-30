@@ -11,7 +11,9 @@ type Space struct {
 	Description string    `gorm:"default:null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	Users       []User    `gorm:"many2many:space_users;constraint:OnDelete:CASCADE;"`
+
+	Lists []List `gorm:"foreignKey:SpaceID"`
+	Users []User `gorm:"many2many:space_users;constraint:OnDelete:CASCADE;"`
 }
 
 type SpaceWithRole struct {
