@@ -56,15 +56,7 @@ func (h *SpaceHandlerImpl) GetAll(ctx *gin.Context) {
 
 func (h *SpaceHandlerImpl) Create(ctx *gin.Context) {
 	var req request.SpaceCreateRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		var validationError validator.ValidationErrors
-		errors.As(err, &validationError)
-		errorMap := utils.ValidationErrorsToMap(validationError)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: errorMap,
-		})
+	if err := validateRequest(ctx, &req); err != nil {
 		return
 	}
 
@@ -97,29 +89,12 @@ func (h *SpaceHandlerImpl) Create(ctx *gin.Context) {
 
 func (h *SpaceHandlerImpl) Update(ctx *gin.Context) {
 	var req request.SpaceUpdateRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		var validationError validator.ValidationErrors
-		errors.As(err, &validationError)
-		errorMap := utils.ValidationErrorsToMap(validationError)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: errorMap,
-		})
+	if err := validateRequest(ctx, &req); err != nil {
 		return
 	}
 
 	userData := ctx.MustGet(middleware.UserDataKey).(*utils.UserClaims)
-	spaceID := ctx.Param("spaceID")
-	parsedSpaceID, err := uuid.Parse(spaceID)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: err.Error(),
-		})
-		return
-	}
+	parsedSpaceID := parseSpaceID(ctx)
 	role := h.spaceService.GetSpaceRoleByUserID(parsedSpaceID, userData.ID)
 	if role == nil || *role != domain.Owner {
 		ctx.AbortWithStatusJSON(http.StatusForbidden, response.ErrorResponse{
@@ -157,16 +132,7 @@ func (h *SpaceHandlerImpl) Update(ctx *gin.Context) {
 }
 
 func (h *SpaceHandlerImpl) Delete(ctx *gin.Context) {
-	spaceID := ctx.Param("spaceID")
-	parsedSpaceID, err := uuid.Parse(spaceID)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: err.Error(),
-		})
-		return
-	}
+	parsedSpaceID := parseSpaceID(ctx)
 
 	userData := ctx.MustGet(middleware.UserDataKey).(*utils.UserClaims)
 	role := h.spaceService.GetSpaceRoleByUserID(parsedSpaceID, userData.ID)
@@ -205,28 +171,11 @@ func (h *SpaceHandlerImpl) Delete(ctx *gin.Context) {
 
 func (h *SpaceHandlerImpl) Invite(ctx *gin.Context) {
 	var req request.SpaceInviteRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		var validationError validator.ValidationErrors
-		errors.As(err, &validationError)
-		errorMap := utils.ValidationErrorsToMap(validationError)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: errorMap,
-		})
+	if err := validateRequest(ctx, &req); err != nil {
 		return
 	}
 
-	spaceID := ctx.Param("spaceID")
-	parsedSpaceID, err := uuid.Parse(spaceID)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-			Code:   http.StatusBadRequest,
-			Status: "Bad Request",
-			Errors: err.Error(),
-		})
-		return
-	}
+	parsedSpaceID := parseSpaceID(ctx)
 
 	userData := ctx.MustGet(middleware.UserDataKey).(*utils.UserClaims)
 	role := h.spaceService.GetSpaceRoleByUserID(parsedSpaceID, userData.ID)
@@ -277,4 +226,34 @@ func (h *SpaceHandlerImpl) Invite(ctx *gin.Context) {
 		Code:   http.StatusNoContent,
 		Status: "NoContent",
 	})
+}
+
+func validateRequest[T interface{}](ctx *gin.Context, req *T) error {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		var validationError validator.ValidationErrors
+		errors.As(err, &validationError)
+		errorMap := utils.ValidationErrorsToMap(validationError)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+			Code:   http.StatusBadRequest,
+			Status: "Bad Request",
+			Errors: errorMap,
+		})
+		return err
+	}
+
+	return nil
+}
+
+func parseSpaceID(ctx *gin.Context) uuid.UUID {
+	spaceID := ctx.Param("spaceID")
+	parsedSpaceID, err := uuid.Parse(spaceID)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+			Code:   http.StatusBadRequest,
+			Status: "Bad Request",
+			Errors: err.Error(),
+		})
+		return uuid.Nil
+	}
+	return parsedSpaceID
 }
