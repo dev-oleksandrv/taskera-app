@@ -16,6 +16,7 @@ func main() {
 	g := r.Group("/api")
 	router.UserRouter(g)
 	router.SpaceRouter(g)
+	router.ListRouter(g)
 
 	if err := r.Run("localhost:8081"); err != nil {
 		panic(err)

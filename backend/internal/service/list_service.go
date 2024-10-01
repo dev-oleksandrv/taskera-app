@@ -1,11 +1,11 @@
-package repository
+package service
 
 import (
 	"dev-oleksandrv/taskera-app/internal/model/domain"
 	"github.com/google/uuid"
 )
 
-type ListRepository interface {
+type ListService interface {
 	GetListByID(listID uuid.UUID) (*domain.List, error)
 	GetAllBySpaceID(spaceID uuid.UUID) ([]domain.List, error)
 	Create(list *domain.List) error
