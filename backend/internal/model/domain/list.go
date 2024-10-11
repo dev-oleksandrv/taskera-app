@@ -17,4 +17,6 @@ type List struct {
 	Space     Space     `gorm:"foreignKey:SpaceID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CreatorID uuid.UUID `gorm:"type:uuid;not null"`
 	Creator   User      `gorm:"foreignKey:CreatorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
+	Tasks []Task `gorm:"foreignKey:ListID"`
 }

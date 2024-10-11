@@ -15,8 +15,10 @@ type User struct {
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 
-	Spaces []Space `gorm:"many2many:space_users"`
-	Lists  []List  `gorm:"foreignKey:CreatorID"`
+	Spaces        []Space `gorm:"many2many:space_users"`
+	Lists         []List  `gorm:"foreignKey:CreatorID"`
+	Tasks         []Task  `gorm:"foreignKey:CreatorID"`
+	AssignedTasks []Task  `gorm:"foreignKey:AssigneeID"`
 }
 
 func (user *User) BeforeCreate(_ *gorm.DB) error {

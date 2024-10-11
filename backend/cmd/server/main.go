@@ -17,6 +17,7 @@ func main() {
 	router.UserRouter(g)
 	router.SpaceRouter(g)
 	router.ListRouter(g)
+	router.TaskRouter(g)
 
 	if err := r.Run("localhost:8081"); err != nil {
 		panic(err)

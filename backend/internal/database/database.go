@@ -28,7 +28,7 @@ func Init() {
 		log.Fatalf("Error connecting to database: %s", err)
 	}
 
-	if err := db.AutoMigrate(&domain.User{}, &domain.Space{}, &domain.SpaceUser{}, &domain.List{}); err != nil {
+	if err := db.AutoMigrate(&domain.User{}, &domain.Space{}, &domain.SpaceUser{}, &domain.List{}, &domain.Task{}); err != nil {
 		log.Fatalf("Error migrating database: %s", err)
 	}
 
